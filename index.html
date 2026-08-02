@@ -3,26 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой сайт</title>
+    <title>MEME CLICKER 3000 🗿</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #fff;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            font-size: 2.5rem;
+            text-shadow: 3px 3px 0px #ff007f;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .stats {
+            font-size: 1.8rem;
+            margin: 15px 0 5px 0;
+            color: #00fff5;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .clicker-btn {
+            font-size: 8rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.05s ease;
+            outline: none;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+            margin: 20px 0;
+        }
+        .clicker-btn:active {
+            transform: scale(0.85) rotate(-5deg);
+        }
+        .upgrades {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 600px;
+        }
+        .btn-upgrade {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #903749;
+            transition: all 0.1s;
+        }
+        .btn-upgrade:hover {
+            background: #ff5e78;
+        }
+        .btn-upgrade:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #903749;
+        }
+        .btn-upgrade:disabled {
+            background: #555;
+            box-shadow: 0 5px 0 #333;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .floating-text {
+            position: absolute;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffe600;
+            pointer-events: none;
+            animation: floatUp 0.8s forwards ease-out;
+            text-shadow: 2px 2px 0 #000;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
+        }
+    </style>
 </head>
 <body>
 
-    <section style="min-height: 100vh; background-image: url('IMG_1446.png.PNG'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; color: white; font-family: sans-serif;">
-        <h1 style="font-size: 3rem; text-shadow: 0 2px 10px black;">Добро пожаловать</h1>
-        <p style="font-size: 1.2rem; text-shadow: 0 1px 6px black;">Листай вниз.</p>
-        <p style="margin-top: 40px; font-size: 2rem;">↓</p>
-    </section>
+    <h1>🗿 MEME CLICKER 3000 🗿</h1>
+    <div class="stats">Мем-очки: <span id="score">0</span></div>
+    <div style="font-size: 1.1rem; color: #aaa; margin-bottom: 10px;">
+        Пассивный доход: <span id="cps">0</span>/сек
+    </div>
 
-    <section style="min-height: 100vh; background-image: url('IMG_1446.png.PNG'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; color: white; font-family: sans-serif;">
-        <h1 style="font-size: 3rem; text-shadow: 0 2px 10px black;">Вторая секция</h1>
-        <p style="font-size: 1.2rem; text-shadow: 0 1px 6px black;">Тут твой текст.</p>
-        <p style="margin-top: 40px; font-size: 2rem;">↓</p>
-    </section>
+    <!-- Главная кнопка -->
+    <button class="clicker-btn" id="clickBtn">🗿</button>
 
-    <section style="min-height: 100vh; background-image: url('IMG_1446.png.PNG'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; color: white; font-family: sans-serif;">
-        <h1 style="font-size: 3rem; text-shadow: 0 2px 10px black;">Третья секция</h1>
-        <p style="font-size: 1.2rem; text-shadow: 0 1px 6px black;">Ты долистал!</p>
-    </section>
+    <!-- Магазин улучшений -->
+    <div class="upgrades">
+        <button class="btn-upgrade" id="upg1" onclick="buyUpgrade(1)">
+            🤖 Кот PopCat (+1/сек)<br>Цена: <span id="cost1">10</span>
+        </button>
+        <button class="btn-upgrade" id="upg2" onclick="buyUpgrade(2)">
+            💪 Сигма Гринд (+2 к клику)<br>Цена: <span id="cost2">25</span>
+        </button>
+        <button class="btn-upgrade" id="upg3" onclick="buyUpgrade(3)">
+            🚀 Ту-Зе-Мун (+10/сек)<br>Цена: <span id="cost3">100</span>
+        </button>
+    </div>
 
+    <script>
+        let score = 0;
+        let clickPower = 1;
+        let autoIncome = 0;
+
+        let cost1 = 10;
+        let cost2 = 25;
+        let cost3 = 100;
+
+        const memes = ["🗿", "🤡", "🐸", "🐱", "🐶", "🚀", "🔥", "🍌"];
+        const quotes = ["БАЗА!", "ЧАД!", "СИГМА", "РИАЛ", "ЭПИК", "АУФ 🐺", "ПРОФИТ!"];
+
+        // Звуковой синтезатор (без внешних файлов)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(freq, type = 'sine') {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+
+        const clickBtn = document.getElementById('clickBtn');
+        const scoreEl = document.getElementById('score');
+        const cpsEl = document.getElementById('cps');
+
+        clickBtn.addEventListener('click', (e) => {
+            score += clickPower;
+            playSound(300 + Math.random() * 200, 'triangle');
+            
+            // Случайная смена мемного эмодзи
+            if (Math.random() < 0.25) {
+                clickBtn.innerText = memes[Math.floor(Math.random() * memes.length)];
+            }
+
+            // Вылетающие надписи
+            showFloatingText(e.clientX, e.clientY);
+            updateUI();
+        });
+
+        function showFloatingText(x, y) {
+            const text = document.createElement('div');
+            text.className = 'floating-text';
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            text.innerText = `+${clickPower} ${randomQuote}`;
+            text.style.left = `${x - 40}px`;
+            text.style.top = `${y - 40}px`;
+            document.body.appendChild(text);
+
+            setTimeout(() => text.remove(), 800);
+        }
+
+        function buyUpgrade(id) {
+            if (id === 1 && score >= cost1) {
+                score -= cost1;
+                autoIncome += 1;
+                cost1 = Math.floor(cost1 * 1.5);
+                playSound(600, 'square');
+            } else if (id === 2 && score >= cost2) {
+                score -= cost2;
+                clickPower += 2;
+                cost2 = Math.floor(cost2 * 1.8);
+                playSound(800, 'square');
+            } else if (id === 3 && score >= cost3) {
+                score -= cost3;
+                autoIncome += 10;
+                cost3 = Math.floor(cost3 * 1.6);
+                playSound(1000, 'square');
+            }
+            updateUI();
+        }
+
+        // Авто-доход раз в секунду
+        setInterval(() => {
+            if (autoIncome > 0) {
+                score += autoIncome;
+                updateUI();
+            }
+        }, 1000);
+
+        function updateUI() {
+            scoreEl.innerText = score;
+            cpsEl.innerText = autoIncome;
+            document.getElementById('cost1').innerText = cost1;
+            document.getElementById('cost2').innerText = cost2;
+            document.getElementById('cost3').innerText = cost3;
+
+            document.getElementById('upg1').disabled = score < cost1;
+            document.getElementById('upg2').disabled = score < cost2;
+            document.getElementById('upg3').disabled = score < cost3;
+        }
+
+        updateUI();
+    </script>
 </body>
 </html>
