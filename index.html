@@ -3,220 +3,1021 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEME CLICKER 3000 🗿</title>
+    <title>Meme Defense: Sigma Empire</title>
     <style>
+        /* ==========================================
+           1. СТИЛИ И ИНТЕРФЕЙС (CSS)
+           ========================================== */
         * {
             box-sizing: border-box;
-            user-select: none;
-        }
-        body {
             margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            color: #fff;
-            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            padding: 0;
+            user-select: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0d0f18;
+            color: #ffffff;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #game-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Canvas Arena */
+        #canvas-wrapper {
+            flex: 1;
+            position: relative;
+            background: #141625;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        /* Top Bar Overlay */
+        #top-bar {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .stat-card {
+            background: rgba(22, 27, 46, 0.85);
+            border: 2px solid #3d446b;
+            border-radius: 12px;
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            pointer-events: auto;
+        }
+
+        .stat-card .icon {
+            font-size: 24px;
+        }
+
+        .stat-card .details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card .label {
+            font-size: 11px;
+            color: #8a94c4;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .stat-card .value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffd700;
+        }
+
+        /* Sidebar Interface */
+        #sidebar {
+            width: 380px;
+            background: #181b2e;
+            border-left: 3px solid #2a2f4c;
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: #101221;
+            border-bottom: 2px solid #2a2f4c;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px 5px;
+            background: transparent;
+            border: none;
+            color: #7a85b8;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .tab-btn.active {
+            color: #00ffcc;
+            background: #181b2e;
+            border-bottom: 3px solid #00ffcc;
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: #ffffff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Scrollbar styles */
+        .tab-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .tab-content::-webkit-scrollbar-track {
+            background: #101221;
+        }
+
+        .tab-content::-webkit-scrollbar-thumb {
+            background: #3d446b;
+            border-radius: 3px;
+        }
+
+        /* Shop Cards */
+        .card {
+            background: #20253e;
+            border: 2px solid #333a61;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.1s, border-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: #00ffcc;
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            font-size: 36px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #121424;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .card-desc {
+            font-size: 11px;
+            color: #9aa4cf;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-level {
+            font-size: 11px;
+            font-weight: bold;
+            color: #ff007f;
+        }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            border: none;
+            color: #000;
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn-buy:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .btn-buy:disabled {
+            background: #4a526d;
+            color: #8890b0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Abilities Bar overlay */
+        #abilities-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .ability-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: rgba(20, 24, 40, 0.9);
+            border: 2px solid #00ffcc;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            cursor: pointer;
+            position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: transform 0.1s;
         }
-        h1 {
-            font-size: 2.5rem;
-            text-shadow: 3px 3px 0px #ff007f;
-            margin-bottom: 5px;
-            text-align: center;
+
+        .ability-btn:active {
+            transform: scale(0.95);
         }
-        .stats {
-            font-size: 1.8rem;
-            margin: 15px 0 5px 0;
-            color: #00fff5;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+
+        .ability-btn .icon {
+            font-size: 24px;
         }
-        .clicker-btn {
-            font-size: 8rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.05s ease;
-            outline: none;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
-            margin: 20px 0;
-        }
-        .clicker-btn:active {
-            transform: scale(0.85) rotate(-5deg);
-        }
-        .upgrades {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 600px;
-        }
-        .btn-upgrade {
-            background: #e94560;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 5px 0 #903749;
-            transition: all 0.1s;
-        }
-        .btn-upgrade:hover {
-            background: #ff5e78;
-        }
-        .btn-upgrade:active {
-            transform: translateY(4px);
-            box-shadow: 0 1px 0 #903749;
-        }
-        .btn-upgrade:disabled {
-            background: #555;
-            box-shadow: 0 5px 0 #333;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .floating-text {
+
+        .ability-btn .key {
+            font-size: 9px;
+            font-weight: 900;
             position: absolute;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #ffe600;
-            pointer-events: none;
-            animation: floatUp 0.8s forwards ease-out;
-            text-shadow: 2px 2px 0 #000;
+            top: 2px;
+            left: 4px;
+            color: #00ffcc;
         }
+
+        .ability-cooldown {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.7);
+            height: 0%;
+            transition: height 0.1s linear;
+        }
+
+        /* Floating Damage Text */
+        .damage-text {
+            position: absolute;
+            font-weight: 900;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            z-index: 30;
+        }
+
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
+            50% { transform: translateY(-30px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
         }
+
+        /* Achievements & Notifications */
+        #toast-container {
+            position: absolute;
+            top: 80px;
+            right: 400px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #ff007f;
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #fff;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Controls / Audio Toggle */
+        .system-btn {
+            background: #252b48;
+            border: 1px solid #3d446b;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .system-btn:hover { background: #323a63; }
+
+        /* Game Over Screen */
+        #game-over-modal {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            backdrop-filter: blur(5px);
+        }
+
+        #game-over-modal h1 {
+            font-size: 48px;
+            color: #ff4757;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+        }
+
+        #game-over-modal p {
+            font-size: 18px;
+            color: #ced6e0;
+            margin-bottom: 20px;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #ff007f, #ff4757);
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255,0,127,0.4);
+            transition: transform 0.2s;
+        }
+        .btn-restart:hover { transform: scale(1.08); }
     </style>
 </head>
 <body>
 
-    <h1>🗿 MEME CLICKER 3000 🗿</h1>
-    <div class="stats">Мем-очки: <span id="score">0</span></div>
-    <div style="font-size: 1.1rem; color: #aaa; margin-bottom: 10px;">
-        Пассивный доход: <span id="cps">0</span>/сек
+<div id="game-container">
+    <!-- Игровой холст -->
+    <div id="canvas-wrapper">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Верхняя панель статистики -->
+        <div id="top-bar">
+            <div class="stat-card">
+                <div class="icon">💰</div>
+                <div class="details">
+                    <span class="label">Монеты Сигмы</span>
+                    <span class="value" id="ui-coins">0</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon">🌊</div>
+                <div class="details">
+                    <span class="label">Волна Мемов</span>
+                    <span class="value" id="ui-wave">1</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon">🏰</div>
+                <div class="details">
+                    <span class="label">Прочность Базы</span>
+                    <span class="value" id="ui-hp">1000 / 1000</span>
+                </div>
+            </div>
+
+            <div>
+                <button class="system-btn" id="btn-sound">🔊 Звук: Вкл</button>
+                <button class="system-btn" id="btn-save">💾 Сохранить</button>
+            </div>
+        </div>
+
+        <!-- Панель активных навыков -->
+        <div id="abilities-bar">
+            <div class="ability-btn" id="ability-1" title="Чиназес Бум (Клавиша 1)">
+                <span class="key">1</span>
+                <span class="icon">💥</span>
+                <div class="ability-cooldown" id="cd-1"></div>
+            </div>
+            <div class="ability-btn" id="ability-2" title="Взгляд Сигмы (Клавиша 2)">
+                <span class="key">2</span>
+                <span class="icon">🗿</span>
+                <div class="ability-cooldown" id="cd-2"></div>
+            </div>
+            <div class="ability-btn" id="ability-3" title="Бархатные Тяги (Клавиша 3)">
+                <span class="key">3</span>
+                <span class="icon">👟</span>
+                <div class="ability-cooldown" id="cd-3"></div>
+            </div>
+        </div>
+
+        <!-- Контейнер для уведолений -->
+        <div id="toast-container"></div>
     </div>
 
-    <!-- Главная кнопка -->
-    <button class="clicker-btn" id="clickBtn">🗿</button>
+    <!-- Боковое меню управлении и прокачки -->
+    <div id="sidebar">
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('towers')">Башни</button>
+            <button class="tab-btn" onclick="switchTab('upgrades')">Прокачка</button>
+            <button class="tab-btn" onclick="switchTab('achievements')">Ачивки</button>
+            <button class="tab-btn" onclick="switchTab('stats')">Инфо</button>
+        </div>
 
-    <!-- Магазин улучшений -->
-    <div class="upgrades">
-        <button class="btn-upgrade" id="upg1" onclick="buyUpgrade(1)">
-            🤖 Кот PopCat (+1/сек)<br>Цена: <span id="cost1">10</span>
-        </button>
-        <button class="btn-upgrade" id="upg2" onclick="buyUpgrade(2)">
-            💪 Сигма Гринд (+2 к клику)<br>Цена: <span id="cost2">25</span>
-        </button>
-        <button class="btn-upgrade" id="upg3" onclick="buyUpgrade(3)">
-            🚀 Ту-Зе-Мун (+10/сек)<br>Цена: <span id="cost3">100</span>
-        </button>
+        <!-- Вкладка Башен -->
+        <div id="tab-towers" class="tab-content active"></div>
+
+        <!-- Вкладка Апгрейдов -->
+        <div id="tab-upgrades" class="tab-content"></div>
+
+        <!-- Вкладка Достижений -->
+        <div id="tab-achievements" class="tab-content"></div>
+
+        <!-- Вкладка Статистики -->
+        <div id="tab-stats" class="tab-content">
+            <h3 style="color:#00ffcc; margin-bottom:10px;">Статистика Профиля</h3>
+            <p style="margin-bottom:8px; font-size:13px;" id="stat-kills">Убито мемов: 0</p>
+            <p style="margin-bottom:8px; font-size:13px;" id="stat-clicks">Всего кликов: 0</p>
+            <p style="margin-bottom:8px; font-size:13px;" id="stat-earned">Заработано монет: 0</p>
+            <p style="margin-bottom:8px; font-size:13px;" id="stat-bosses">Повержено боссов: 0</p>
+            <hr style="border-color:#2a2f4c; margin:15px 0;">
+            <p style="font-size:11px; color:#8a94c4; line-height:1.4;">
+                Кликай по нападающим мемам или строить защитные башни! Не дай мемам разрушить цитадель Гигачада!
+            </p>
+        </div>
     </div>
+</div>
 
-    <script>
-        let score = 0;
-        let clickPower = 1;
-        let autoIncome = 0;
+<!-- Модалка Game Over -->
+<div id="game-over-modal">
+    <h1>ТВОЙ БАЗИРОВАННЫЙ ЩИТ ПРОБИТ!</h1>
+    <p>Мемы захватили твою базу на волне <span id="go-wave">0</span></p>
+    <button class="btn-restart" onclick="restartGame()">ПОПРОБОВАТЬ СНОВА</button>
+</div>
 
-        let cost1 = 10;
-        let cost2 = 25;
-        let cost3 = 100;
+<script>
+/* ==========================================================================
+   2. АУДИО СИНТЕЗАТОР (Web Audio API - без внешних файлов)
+   ========================================================================== */
+class SoundEngine {
+    constructor() {
+        this.ctx = null;
+        this.enabled = true;
+    }
 
-        const memes = ["🗿", "🤡", "🐸", "🐱", "🐶", "🚀", "🔥", "🍌"];
-        const quotes = ["БАЗА!", "ЧАД!", "СИГМА", "РИАЛ", "ЭПИК", "АУФ 🐺", "ПРОФИТ!"];
+    init() {
+        if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+        }
+    }
 
-        // Звуковой синтезатор (без внешних файлов)
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(freq, type = 'sine') {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
+    play(type) {
+        if (!this.enabled) return;
+        this.init();
+        if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
         }
 
-        const clickBtn = document.getElementById('clickBtn');
-        const scoreEl = document.getElementById('score');
-        const cpsEl = document.getElementById('cps');
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
 
-        clickBtn.addEventListener('click', (e) => {
-            score += clickPower;
-            playSound(300 + Math.random() * 200, 'triangle');
+        if (type === 'click') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.05);
+        } else if (type === 'hit') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(40, now + 0.08);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        } else if (type === 'coin') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(987.77, now); // B5
+            osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        } else if (type === 'explosion') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.linearRampToValueAtTime(20, now + 0.3);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'boss') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(60, now);
+            osc.frequency.linearRampToValueAtTime(120, now + 0.2);
+            osc.frequency.linearRampToValueAtTime(40, now + 0.5);
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+            osc.start(now);
+            osc.stop(now + 0.5);
+        }
+    }
+}
+
+const sounds = new SoundEngine();
+
+/* ==========================================================================
+   3. ГЛОБАЛЬНОЕ СОСТОЯНИЕ И НАСТРОЙКИ ИГРЫ
+   ========================================================================== */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let state = {
+    coins: 100,
+    totalEarned: 100,
+    wave: 1,
+    hp: 1000,
+    maxHp: 1000,
+    clickDamage: 15,
+    kills: 0,
+    clicks: 0,
+    bossesDefeated: 0,
+    screenShake: 0,
+    isGameOver: false
+};
+
+// Конфигурации башен
+const TOWER_TYPES = [
+    {
+        id: 'capybara',
+        name: 'Капибара Крутая',
+        desc: 'Спокойно стреляет апельсинами во врагов.',
+        icon: '🦫',
+        baseCost: 50,
+        costMult: 1.5,
+        damage: 8,
+        range: 160,
+        attackSpeed: 1.2, // выстрелов в сек
+        count: 0
+    },
+    {
+        id: 'sigma_cat',
+        name: 'Сигма Кот',
+        desc: 'Быстро атакует сфокусированным сигма-лучом.',
+        icon: '😼',
+        baseCost: 150,
+        costMult: 1.6,
+        damage: 25,
+        range: 200,
+        attackSpeed: 2.0,
+        count: 0
+    },
+    {
+        id: 'wise_tree',
+        name: 'Мудрое Дерево',
+        desc: 'Если тебе за 50 и у тебя есть ПК, эта башня для тебя.',
+        icon: '🌳',
+        baseCost: 400,
+        costMult: 1.7,
+        damage: 70,
+        range: 250,
+        attackSpeed: 0.8,
+        count: 0
+    },
+    {
+        id: 'shrek',
+        name: 'Шрек с Болота',
+        desc: 'Мощный массовый урон грязевыми бомбами.',
+        icon: '👹',
+        baseCost: 1000,
+        costMult: 1.8,
+        damage: 200,
+        range: 300,
+        attackSpeed: 0.5,
+        count: 0
+    }
+];
+
+// Прокачки игрока
+const UPGRADES = [
+    {
+        id: 'click_pwr',
+        name: 'Мощный Тап',
+        desc: 'Увеличивает урон от прямого клика по врагу.',
+        icon: '🥊',
+        baseCost: 30,
+        costMult: 1.4,
+        level: 1,
+        apply: () => { state.clickDamage += 10; }
+    },
+    {
+        id: 'base_fortify',
+        name: 'Укрепление Цитадели',
+        desc: 'Повышает максимальное HP базы и чинит её.',
+        icon: '🏰',
+        baseCost: 100,
+        costMult: 1.5,
+        level: 0,
+        apply: () => { 
+            state.maxHp += 300; 
+            state.hp += 300; 
+        }
+    },
+    {
+        id: 'coin_boost',
+        name: 'Мемная Инфляция',
+        desc: 'Дает на 25% больше монет за уничтожение врагов.',
+        icon: '💎',
+        baseCost: 200,
+        costMult: 1.8,
+        level: 0,
+        bonus: 1.0,
+        apply: function() { this.bonus += 0.25; }
+    }
+];
+
+// Способности
+const ABILITIES = {
+    1: { id: 1, name: 'Чиназес Бум', cd: 15, currentCd: 0, icon: '💥' },
+    2: { id: 2, name: 'Взгляд Сигмы', cd: 25, currentCd: 0, icon: '🗿' },
+    3: { id: 3, name: 'Бархатные Тяги', cd: 40, currentCd: 0, icon: '👟' }
+};
+
+// Список видов врагов
+const ENEMY_TYPES = [
+    { name: 'Скибиди', icon: '🚽', hpMult: 1, speed: 1.2, reward: 10, radius: 22 },
+    { name: 'Поп-Кэт', icon: '🐱', hpMult: 0.7, speed: 2.0, reward: 12, radius: 18 },
+    { name: 'Альтушка', icon: '👩‍🎤', hpMult: 1.5, speed: 0.9, reward: 20, radius: 25 },
+    { name: 'Доге', icon: '🐕', hpMult: 2.2, speed: 1.1, reward: 35, radius: 26 },
+    { name: 'Тапальщик Хомяка', icon: '🐹', hpMult: 3.5, speed: 0.8, reward: 60, radius: 28 },
+    { name: 'БОСС: ГРИМАС', icon: '👾', hpMult: 15, speed: 0.5, reward: 300, radius: 45, isBoss: true }
+];
+
+// Ачивки
+const ACHIEVEMENTS = [
+    { id: 'first_kill', title: 'Первый Базированный', desc: 'Уничтожь 1 мем', unlocked: false, icon: '🎯' },
+    { id: 'clicker_100', title: 'Затапанный', desc: 'Сделай 100 кликов', unlocked: false, icon: '👆' },
+    { id: 'wave_10', title: 'Выживший', desc: 'Дойди до 10-й волны', unlocked: false, icon: '🛡️' },
+    { id: 'rich', title: 'Криптомагнат', desc: 'Накопи 5 000 монет', unlocked: false, icon: '🤑' },
+    { id: 'boss_slayer', title: 'Гигачад Месяца', desc: 'Победи 3 боссов', unlocked: false, icon: '👑' }
+];
+
+/* ==========================================================================
+   4. ИГРОВЫЕ ОБЪЕКТЫ И МАССИВЫ
+   ========================================================================== */
+let enemies = [];
+let towers = [];
+let projectiles = [];
+let particles = [];
+let damageTexts = [];
+
+// Позиция Базы на Canvas
+let basePosition = { x: 100, y: 300, radius: 70 };
+
+/* ==========================================================================
+   5. ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ (Частицы, Текст, Проектили)
+   ========================================================================== */
+class Particle {
+    constructor(x, y, color, speed, size) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.vx = (Math.random() - 0.5) * speed;
+        this.vy = (Math.random() - 0.5) * speed;
+        this.size = Math.random() * size + 2;
+        this.life = 1.0;
+        this.decay = Math.random() * 0.03 + 0.015;
+    }
+
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life -= this.decay;
+    }
+
+    draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.life);
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+class Projectile {
+    constructor(x, y, target, damage, speed, color = '#00ffcc') {
+        this.x = x;
+        this.y = y;
+        this.target = target;
+        this.damage = damage;
+        this.speed = speed;
+        this.color = color;
+        this.active = true;
+    }
+
+    update() {
+        if (!this.target || this.target.hp <= 0) {
+            this.active = false;
+            return;
+        }
+
+        const dx = this.target.x - this.x;
+        const dy = this.target.y - this.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < 10) {
+            this.target.hit(this.damage);
+            this.active = false;
+            createExplosion(this.x, this.y, this.color, 8);
+        } else {
+            this.x += (dx / dist) * this.speed;
+            this.y += (dy / dist) * this.speed;
+        }
+    }
+
+    draw(ctx) {
+        ctx.save();
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+class Enemy {
+    constructor(typeObj, waveLevel) {
+        this.name = typeObj.name;
+        this.icon = typeObj.icon;
+        this.radius = typeObj.radius;
+        this.speed = typeObj.speed * (1 + waveLevel * 0.03);
+        
+        const baseHp = typeObj.isBoss ? 400 : 40;
+        this.maxHp = Math.round(baseHp * typeObj.hpMult * Math.pow(1.15, waveLevel - 1));
+        this.hp = this.maxHp;
+        this.reward = Math.round(typeObj.reward * (1 + waveLevel * 0.1));
+        this.isBoss = !!typeObj.isBoss;
+
+        // Точка появления справа за экраном
+        this.x = canvas.width + 50 + Math.random() * 100;
+        this.y = Math.random() * (canvas.height - 160) + 80;
+
+        this.wobble = Math.random() * Math.PI * 2;
+    }
+
+    update() {
+        // Движение к базе
+        const dx = basePosition.x - this.x;
+        const dy = basePosition.y - this.y;
+        const dist = Math.hypot(dx, dy);
+
+        this.wobble += 0.08;
+        const currentSpeed = this.speed;
+
+        if (dist > basePosition.radius) {
+            this.x += (dx / dist) * currentSpeed;
+            this.y += (dy / dist) * currentSpeed + Math.sin(this.wobble) * 0.5;
+        } else {
+            // Атака базы
+            state.hp -= this.isBoss ? 50 : 10;
+            sounds.play('hit');
+            triggerScreenShake(8);
+            if (state.hp <= 0) {
+                state.hp = 0;
+                gameOver();
+            }
+            this.hp = 0; // Нанося урон, обычный враг погибает
+        }
+    }
+
+    hit(dmg) {
+        this.hp -= dmg;
+        spawnDamageText(this.x, this.y, Math.round(dmg), '#ff4757');
+        sounds.play('hit');
+
+        if (this.hp <= 0) {
+            const coinUpgrade = UPGRADES.find(u => u.id === 'coin_boost');
+            const bonusMult = coinUpgrade ? coinUpgrade.bonus : 1.0;
+            const finalReward = Math.round(this.reward * bonusMult);
             
-            // Случайная смена мемного эмодзи
-            if (Math.random() < 0.25) {
-                clickBtn.innerText = memes[Math.floor(Math.random() * memes.length)];
+            state.coins += finalReward;
+            state.totalEarned += finalReward;
+            state.kills++;
+            if (this.isBoss) state.bossesDefeated++;
+
+            sounds.play('coin');
+            createExplosion(this.x, this.y, '#ffd700', 15);
+            checkAchievements();
+        }
+    }
+
+    draw(ctx) {
+        ctx.save();
+        ctx.font = `${this.radius * 1.8}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Тень врага
+        ctx.shadowColor = this.isBoss ? 'rgba(255, 0, 127, 0.8)' : 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = this.isBoss ? 20 : 5;
+
+        ctx.fillText(this.icon, this.x, this.y);
+
+        // Полоска здоровья
+        const barW = this.radius * 2;
+        const barH = 6;
+        const barX = this.x - barW / 2;
+        const barY = this.y - this.radius - 12;
+
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillRect(barX, barY, barW, barH);
+
+        const hpPct = Math.max(0, this.hp / this.maxHp);
+        ctx.fillStyle = hpPct > 0.5 ? '#2ed573' : (hpPct > 0.25 ? '#ffa502' : '#ff4757');
+        ctx.fillRect(barX, barY, barW * hpPct, barH);
+        
+        ctx.restore();
+    }
+}
+
+class BuiltTower {
+    constructor(typeConfig, x, y) {
+        this.config = typeConfig;
+        this.x = x;
+        this.y = y;
+        this.lastShot = 0;
+    }
+
+    update(now) {
+        const fireInterval = 1000 / this.config.attackSpeed;
+        if (now - this.lastShot >= fireInterval) {
+            // Поиск ближайшего врага в радиусе
+            let nearest = null;
+            let minDist = this.config.range;
+
+            for (let enemy of enemies) {
+                const d = Math.hypot(enemy.x - this.x, enemy.y - this.y);
+                if (d < minDist) {
+                    minDist = d;
+                    nearest = enemy;
+                }
             }
 
-            // Вылетающие надписи
-            showFloatingText(e.clientX, e.clientY);
-            updateUI();
-        });
-
-        function showFloatingText(x, y) {
-            const text = document.createElement('div');
-            text.className = 'floating-text';
-            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            text.innerText = `+${clickPower} ${randomQuote}`;
-            text.style.left = `${x - 40}px`;
-            text.style.top = `${y - 40}px`;
-            document.body.appendChild(text);
-
-            setTimeout(() => text.remove(), 800);
-        }
-
-        function buyUpgrade(id) {
-            if (id === 1 && score >= cost1) {
-                score -= cost1;
-                autoIncome += 1;
-                cost1 = Math.floor(cost1 * 1.5);
-                playSound(600, 'square');
-            } else if (id === 2 && score >= cost2) {
-                score -= cost2;
-                clickPower += 2;
-                cost2 = Math.floor(cost2 * 1.8);
-                playSound(800, 'square');
-            } else if (id === 3 && score >= cost3) {
-                score -= cost3;
-                autoIncome += 10;
-                cost3 = Math.floor(cost3 * 1.6);
-                playSound(1000, 'square');
+            if (nearest) {
+                projectiles.push(new Projectile(this.x, this.y, nearest, this.config.damage, 9, '#00ffcc'));
+                this.lastShot = now;
             }
-            updateUI();
         }
+    }
 
-        // Авто-доход раз в секунду
-        setInterval(() => {
-            if (autoIncome > 0) {
-                score += autoIncome;
-                updateUI();
+    draw(ctx) {
+        ctx.save();
+        // Платформа башни
+        ctx.fillStyle = '#20253e';
+        ctx.strokeStyle = '#00ffcc';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 24, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Иконка
+        ctx.font = '24px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.config.icon, this.x, this.y);
+        ctx.restore();
+    }
+}
+
+/* ==========================================================================
+   6. ИНИЦИАЛИЗАЦИЯ И СПАВН ВОЛН
+   ========================================================================== */
+let waveManager = {
+    inProgress: false,
+    enemiesToSpawn: 0,
+    spawnInterval: null,
+    currentWaveTimer: 0
+};
+
+function startNextWave() {
+    state.wave++;
+    waveManager.inProgress = true;
+    
+    // Формула кол-ва врагов
+    waveManager.enemiesToSpawn = 8 + state.wave * 4;
+
+    let spawned = 0;
+    const isBossWave = state.wave % 5 === 0;
+
+    if (waveManager.spawnInterval) clearInterval(waveManager.spawnInterval);
+
+    sounds.play(isBossWave ? 'boss' : 'click');
+    showToast(isBossWave ? '⚠️ БОСС ВОЛНА!' : `Волна ${state.wave} началась!`);
+
+    waveManager.spawnInterval = setInterval(() => {
+        if (spawned < waveManager.enemiesToSpawn) {
+            // Выбор типа врага
+            let type;
+            if (isBossWave && spawned === 0) {
+                type = ENEMY_TYPES.find(e => e.isBoss);
+            } else {
+                const normalTypes = ENEMY_TYPES.filter(e => !e.isBoss);
+                type = normalTypes[Math.floor(Math.random() * normalTypes.length)];
             }
-        }, 1000);
-
-        function updateUI() {
-            scoreEl.innerText = score;
-            cpsEl.innerText = autoIncome;
-            document.getElementById('cost1').innerText = cost1;
-            document.getElementById('cost2').innerText = cost2;
-            document.getElementById('cost3').innerText = cost3;
-
-            document.getElementById('upg1').disabled = score < cost1;
-            document.getElementById('upg2').disabled = score < cost2;
-            document.getElementById('upg3').disabled = score < cost3;
+            enemies.push(new Enemy(type, state.wave));
+            spawned++;
+        } else {
+            clearInterval(waveManager.spawnInterval);
         }
+    }, Math.max(400, 1500 - state.wave * 50));
+}
 
-        updateUI();
-    </script>
-</body>
-</html>
+/* ==========================================================================
+   7. УПРАВЛЕНИЕ ИНТЕРФЕЙСОМ И ВКТАДКАМИ
+   ========================================================================== */
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+    event.target.classList.add('active');
+    document.getElementById(`tab-${tabId}`).classList.add('active');
+}
+
+function renderShop() {
+    // Вкладка Башен
+    const towersTab = document.getElementById('tab-towers');
+    towersTab.innerHTML = '';
+    
+    TOWER_TYPES.forEach(t => {
+        const cost = Math.round(t.baseCost * Math.pow(t.costMult, t.count));
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <div class="card-icon">${t.icon}</div>
+            <div class="card-info">
+                <div class="card-title">${t.name}</div>
+                <div class="card-desc">${t.desc}<br>Урон: ${t.damage} | АоЕ: ${t.range}</div>
+                <div class="card-meta">
+                    <span class="card-level">Куплено: ${t.count}</span>
+                    <button class="btn-buy" onclick="buyTower('${t.id}')" ${state.coins
